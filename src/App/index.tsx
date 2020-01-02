@@ -1,5 +1,6 @@
 import axios from 'axios';
 import OdkFormRenderer from 'odkformrenderer';
+import 'odkformrenderer/example/index.css';
 import queryString from 'query-string';
 import * as React from 'react';
 import { ClipLoader } from 'react-spinners';
@@ -101,7 +102,15 @@ class App extends React.Component<{}, AppState> {
 
           JSZipUtils.getBinaryContent(csvUrl, (err: any, data: any) => {
             if (err) {
-              throw err;
+              if (
+                window.confirm(
+                  'An Error Occurred. Do you want to Reload Again?'
+                )
+              ) {
+                window.location.reload();
+              } else {
+                throw err;
+              }
             }
 
             JSZip.loadAsync(data).then((zip: any) => {
@@ -128,9 +137,13 @@ class App extends React.Component<{}, AppState> {
         </div>
       );
     } else {
+      const language: string =
+        this.state.defaultLanguage === 'default'
+          ? 'English'
+          : this.state.defaultLanguage;
       const odkProps: OdkProps = {
         csvList: {},
-        defaultLanguage: 'English',
+        defaultLanguage: language,
         formDefinitionJson: this.state.formJson,
         handleSubmit: this.handleSubmit,
         languageOptions,
@@ -145,10 +158,59 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
-  public handleSubmit() {
-    console.log('Test');
-  }
+  /** submit user input data to the postbackUrl
+   * @param {any} userInput - the user input data json from OdkFromRendere
+   */
+  public handleSubmit = (userInput: any) => {
+    if (
+      userInput &&
+      userInput !== 'Field Violated' &&
+      userInput !== 'submitted'
+    ) {
+      const postbackUrl = this.state.postbackUrl;
+      const formDefinition = this.state.formJson;
+      const idString: string = 'id_string';
+      let formData = JSON.parse(JSON.stringify(userInput)) || {};
 
+      formData = { ...formData, 'formhub/uuid': this.state.formUuid };
+      formData = { ...formData, 'meta/instanceID': this.guid() };
+      const blob = new Blob(
+        [this.convertJsonToXml(formData, formDefinition[idString])],
+        { type: 'text/xml' }
+      );
+      const formDataForBlob: any = new FormData();
+      formDataForBlob.append('xml_submission_file', blob);
+
+      axios
+        .post(postbackUrl, formDataForBlob, {
+          headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Methods':
+              'GET, POST, PATCH, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        .then(response => {
+          alert('Form Submitted Successfully.');
+          // tslint:disable-next-line: no-console
+          console.log(response);
+          window.location.reload();
+          window.scrollTo(0, 0);
+        })
+        .catch(error => {
+          throw error;
+        });
+    }
+  };
+
+  /** Convert csv to human readable object and assign this to the App state
+   * @param {any} zip - the zip collecyion of csv files generated from csvUrl
+   * @param {any} csvFiles - the csv files array from zip file
+   * @param {number} i - initially zero to indicate the first csv file
+   * @param {any} tmpCsv - the converted csv object that is assigned to the state
+   * @param {any} preloadUserInput - the preload user input data
+   */
   private writeCsvToObj = (
     zip: any,
     csvFiles: any,
@@ -190,6 +252,146 @@ class App extends React.Component<{}, AppState> {
         }
         return tmpCsv;
       });
+  };
+
+  private s4 = () => {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  };
+
+  private guid = () => {
+    return (
+      'uuid:' +
+      this.s4() +
+      this.s4() +
+      '-' +
+      this.s4() +
+      '-' +
+      this.s4() +
+      '-' +
+      this.s4() +
+      '-' +
+      this.s4() +
+      this.s4() +
+      this.s4()
+    );
+  };
+
+  /** converts json object to xml text
+   * @param {Object} jsnObj - the user input json object
+   * @param {string} formIdString - the form unique name
+   * @returns {string} - the odk format xml string
+   */
+  private convertJsonToXml = (jsnObj: any, formIdString: any): string => {
+    const modifiedJsnObj: any = {};
+    Object.keys(jsnObj).forEach(jsnKey => {
+      const jsnPath = jsnKey.split('/');
+      this.assignJsnValue(modifiedJsnObj, jsnPath, 0, jsnObj[jsnKey]);
+    });
+    let xmlString = "<?xml version='1.0'?>";
+    xmlString += `<${formIdString} id="${formIdString}">`;
+
+    Object.keys(modifiedJsnObj).forEach(mkey => {
+      xmlString += this.generateIndividualXml(mkey, modifiedJsnObj[mkey]);
+    });
+
+    xmlString += `</${formIdString}>`;
+    return xmlString;
+  };
+
+  /** recursive method that transforms odk json format object to a simpler one
+   * @param {Object} mJsnObj - modified json
+   * @param {string[]} xPath - the path array generated by splitting the key with '/'
+   * @param {number} index - the current index of the xpath
+   * @param {any} xvalue - the value to be assigned to the modified object based on xpath key
+   */
+  private assignJsnValue = (
+    mJsnObj: any,
+    xPath: any,
+    index: number,
+    xvalue: any
+  ) => {
+    if (index === xPath.length - 1) {
+      // eslint-disable-next-line no-param-reassign
+      mJsnObj[xPath[index]] = xvalue;
+      return;
+    }
+    if (!(xPath[index] in mJsnObj)) {
+      // eslint-disable-next-line no-param-reassign
+      mJsnObj[xPath[index]] = {};
+      this.assignJsnValue(mJsnObj[xPath[index]], xPath, index + 1, xvalue);
+    } else {
+      this.assignJsnValue(mJsnObj[xPath[index]], xPath, index + 1, xvalue);
+    }
+  };
+
+  /** transforms individual json key, value to xml attribute based on json value type
+   * @param {string} xkey - json key
+   * @param {any} xvalue - json value
+   * @returns {string} - the transformed xml value
+   */
+  private generateIndividualXml = (xkey: any, xvalue: any) => {
+    let tmp = '';
+    if (xvalue !== null && xvalue !== undefined) {
+      if (Array.isArray(xvalue)) {
+        if (xvalue.length > 0) {
+          if (xvalue[0].constructor.name === 'Object') {
+            xvalue.forEach(tmpValue => {
+              tmp += this.generateIndividualXml(xkey, tmpValue);
+            });
+          } else if (xvalue[0].constructor.name === 'Date') {
+            tmp += `<${xkey}>`;
+            xvalue.forEach(tmpValue => {
+              tmp += `${tmpValue} `;
+            });
+            tmp += `</${xkey}>`;
+          } else {
+            tmp += `<${xkey}>`;
+            xvalue.forEach(tmpValue => {
+              tmp += `${
+                typeof tmpValue === 'string'
+                  ? this.handleXmlInvalidEntries(tmpValue)
+                  : tmpValue
+              } `;
+            });
+            tmp += `</${xkey}>`;
+          }
+        }
+      } else if (xvalue.constructor.name === 'Object') {
+        if (Object.keys(xvalue).length !== 0) {
+          tmp += `<${xkey}>`;
+          Object.keys(xvalue).forEach(tmpKey => {
+            tmp += this.generateIndividualXml(tmpKey, xvalue[tmpKey]);
+          });
+          tmp += `</${xkey}>`;
+        }
+      } else if (xvalue.constructor.name === 'Date') {
+        tmp += `<${xkey}>`;
+        tmp += xvalue.toISOString();
+        tmp += `</${xkey}>`;
+      } else {
+        tmp += `<${xkey}>`;
+        tmp +=
+          typeof xvalue === 'string'
+            ? this.handleXmlInvalidEntries(xvalue)
+            : xvalue;
+        tmp += `</${xkey}>`;
+      }
+    }
+    return tmp;
+  };
+
+  /** Replaces invalid xml entries with special xml entries
+   * @param {string} affectedString - the string containing invalid xml invalid entries
+   * @returns {string} - the modified string with no invalid xml entries
+   */
+  private handleXmlInvalidEntries = (affectedString: any) => {
+    let tmpString = affectedString;
+    tmpString = tmpString.replace('&', '&amp;');
+    tmpString = tmpString.replace('<', '&lt;');
+    tmpString = tmpString.replace('>', '&gt;');
+    return tmpString;
   };
 }
 
