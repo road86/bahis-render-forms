@@ -119,6 +119,10 @@ class App extends React.Component<{}, AppState> {
             });
           });
         }
+      })
+      .catch(error => {
+        window.alert('Authentication Error!');
+        throw error;
       });
   }
 
@@ -142,7 +146,7 @@ class App extends React.Component<{}, AppState> {
           ? 'English'
           : this.state.defaultLanguage;
       const odkProps: OdkProps = {
-        csvList: {},
+        csvList: this.state.csv,
         defaultLanguage: language,
         formDefinitionJson: this.state.formJson,
         handleSubmit: this.handleSubmit,

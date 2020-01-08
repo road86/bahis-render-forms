@@ -7559,7 +7559,7 @@ obuf@^1.0.0, obuf@^1.1.2:
 
 "odkformrenderer@git+http://192.168.19.42/nafiz/test_package.git":
   version "0.1.0"
-  resolved "git+http://192.168.19.42/nafiz/test_package.git#3e86ce2fc9fd6e5df6cd0b4c69e0c20c71d0768b"
+  resolved "git+http://192.168.19.42/nafiz/test_package.git#b386224d5b87ea37fe803711799b5f805e459235"
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^1.2.25"
     "@fortawesome/free-brands-svg-icons" "^5.11.2"
