@@ -163,9 +163,10 @@ class App extends React.Component<{}, AppState> {
   }
 
   /** submit user input data to the postbackUrl
-   * @param {any} userInput - the user input data json from OdkFromRendere
+   * @param {any} userInput - the user input data json from OdkFromRenderer
+   * @param {any} mediaList - the mediaList object if present or empty object
    */
-  public handleSubmit = (userInput: any) => {
+  public handleSubmit = (userInput: any, mediaList: any) => {
     if (
       userInput &&
       userInput !== 'Field Violated' &&
@@ -184,6 +185,11 @@ class App extends React.Component<{}, AppState> {
       );
       const formDataForBlob: any = new FormData();
       formDataForBlob.append('xml_submission_file', blob);
+      if (Object.keys(mediaList).length) {
+        Object.keys(mediaList).forEach(fileName => {
+          formDataForBlob.append(fileName, mediaList[fileName]);
+        });
+      }
 
       axios
         .post(postbackUrl, formDataForBlob, {
