@@ -1,4 +1,10 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Odk Form Renderer Standalone 
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). The app behaves similar to the [odk-form-renderer-v1](https://bitbucket.org/mpowersocial/odk-form-renderer-v1/src/master/) app. Internally, it uses the library [odk-form-renderer-v2](https://bitbucket.org/mpowersocial/odk-form-renderer-v2/src/master/) and is written in typescript instead of javascript.
+
+To render a form, you will need to pass URL parameters including but not limited to the `username` and `url`. The `url` is the location of form definition and `username` is usually the admin user name through which form definition is read. Based on the provided information, the app will make a post request to the server (`http://${url}/${username}/form_attributes`) to retrieve the required properties.
+
+> Please see any existing running instance or the codebase for detailed understanding. The implementation is flexible and can be modified to suit any needs.
 
 ## Available Scripts
 
