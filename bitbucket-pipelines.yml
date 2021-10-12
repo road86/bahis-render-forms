@@ -1,0 +1,9 @@
+image: python:3.6
+ 
+pipelines:
+  branches:
+    develop:
+      - step:
+          name: Test
+          script:
+            - ssh mpower@123.200.18.24 "/home/mpower/ansible-virtualenv/bin/ansible-playbook -i /home/mpower/cicd-form-builder-stand-alone/hosts /home/mpower/cicd-form-builder-stand-alone/cicd-form-builder-stand-alone.yml >> /home/mpower/cicd-log/cicd-form-builder-stand-alone-log"
