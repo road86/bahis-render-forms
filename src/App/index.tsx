@@ -48,15 +48,7 @@ class App extends React.Component<{}, AppState> {
       'http://' + urlParams.url + '/' + urlParams.username + '/form_attributes';
 
     axios
-      .post(formAttributesURL, urlParams, {
-        headers: {
-          'Access-Control-Allow-Headers': '*',
-          'Access-Control-Allow-Methods':
-            'DELETE, GET, OPTIONS, POST, PATCH, PUT',
-          'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json',
-        },
-      })
+      .post(formAttributesURL, urlParams)
       .then(response => {
         const postbackUrl: string =
           response.data && response.data.submission_url;
@@ -154,6 +146,8 @@ class App extends React.Component<{}, AppState> {
         userInputJson: this.state.userInput,
       };
 
+      console.log('-------------odk props ------------------');
+      console.log(odkProps);
       return (
         <div className="App">
           {this.state.formJson ? <OdkFormRenderer {...odkProps} /> : null}
