@@ -78,17 +78,17 @@ class App extends React.Component<{}, AppState> {
         //     userInput: csvUserInput,
         //   });
         // } else {
-        //   this.setState({
-        //     csv: {},
-        //     defaultLanguage,
-        //     errorList: [],
-        //     formJson,
-        //     formUuid,
-        //     isLoading: false,
-        //     media: {},
-        //     postbackUrl,
-        //     userInput,
-        //   });
+          this.setState({
+            csv: {},
+            defaultLanguage,
+            errorList: [],
+            formJson,
+            formUuid,
+            isLoading: false,
+            media: {},
+            postbackUrl,
+            userInput,
+          });
         // }
 
         if (csvUrl) {
