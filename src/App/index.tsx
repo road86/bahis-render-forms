@@ -62,31 +62,34 @@ class App extends React.Component<{}, AppState> {
         const userInput: any = dataJson ? dataJson : {};
         const csvUserInput: any = {};
 
-        if (csvUrl) {
-          this.setState({
-            csv: {},
-            defaultLanguage,
-            errorList: [],
-            formJson,
-            formUuid,
-            isLoading: true,
-            media: {},
-            postbackUrl,
-            userInput: csvUserInput,
-          });
-        } else {
-          this.setState({
-            csv: {},
-            defaultLanguage,
-            errorList: [],
-            formJson,
-            formUuid,
-            isLoading: false,
-            media: {},
-            postbackUrl,
-            userInput,
-          });
-        }
+        /**  
+         * mpower PM sayem siddiqui sayed we don't need this condition 
+         * */
+        // if (csvUrl) {
+        //   this.setState({
+        //     csv: {},
+        //     defaultLanguage,
+        //     errorList: [],
+        //     formJson,
+        //     formUuid,
+        //     isLoading: true,
+        //     media: {},
+        //     postbackUrl,
+        //     userInput: csvUserInput,
+        //   });
+        // } else {
+        //   this.setState({
+        //     csv: {},
+        //     defaultLanguage,
+        //     errorList: [],
+        //     formJson,
+        //     formUuid,
+        //     isLoading: false,
+        //     media: {},
+        //     postbackUrl,
+        //     userInput,
+        //   });
+        // }
 
         if (csvUrl) {
           const JSZip = require('jszip');
