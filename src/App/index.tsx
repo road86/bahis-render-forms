@@ -78,17 +78,17 @@ class App extends React.Component<{}, AppState> {
         //     userInput: csvUserInput,
         //   });
         // } else {
-          this.setState({
-            csv: {},
-            defaultLanguage,
-            errorList: [],
-            formJson,
-            formUuid,
-            isLoading: false,
-            media: {},
-            postbackUrl,
-            userInput,
-          });
+        this.setState({
+          csv: {},
+          defaultLanguage,
+          errorList: [],
+          formJson,
+          formUuid,
+          isLoading: false,
+          media: {},
+          postbackUrl,
+          userInput,
+        });
         // }
 
         if (csvUrl) {
@@ -164,6 +164,9 @@ class App extends React.Component<{}, AppState> {
    * @param {any} mediaList - the mediaList object if present or empty object
    */
   public handleSubmit = (userInput: any, mediaList: any) => {
+
+    const result = window.confirm('Are you sure you want to submit ?');
+    if (!result) return;
     if (
       userInput &&
       userInput !== 'Field Violated' &&
@@ -356,11 +359,10 @@ class App extends React.Component<{}, AppState> {
           } else {
             tmp += `<${xkey}>`;
             xvalue.forEach(tmpValue => {
-              tmp += `${
-                typeof tmpValue === 'string'
-                  ? this.handleXmlInvalidEntries(tmpValue)
-                  : tmpValue
-              } `;
+              tmp += `${typeof tmpValue === 'string'
+                ? this.handleXmlInvalidEntries(tmpValue)
+                : tmpValue
+                } `;
             });
             tmp += `</${xkey}>`;
           }
