@@ -342,6 +342,11 @@ class App extends React.Component<{}, AppState> {
    * @returns {string} - the transformed xml value
    */
   private generateIndividualXml = (xkey: any, xvalue: any) => {
+
+    const getObjKey = (value: any) => {
+      let arr: any = value.split('/');
+      return arr[arr.length - 1];
+    }
     let tmp = '';
     if (xvalue !== null && xvalue !== undefined) {
       if (Array.isArray(xvalue)) {
@@ -351,20 +356,20 @@ class App extends React.Component<{}, AppState> {
               tmp += this.generateIndividualXml(xkey, tmpValue);
             });
           } else if (xvalue[0].constructor.name === 'Date') {
-            tmp += `<${xkey}>`;
+            tmp += `<${getObjKey(xkey)}>`;
             xvalue.forEach(tmpValue => {
               tmp += `${tmpValue} `;
             });
-            tmp += `</${xkey}>`;
+            tmp += `</${getObjKey(xkey)}>`;
           } else {
-            tmp += `<${xkey}>`;
+            tmp += `<${getObjKey(xkey)}>`;
             xvalue.forEach(tmpValue => {
               tmp += `${typeof tmpValue === 'string'
                 ? this.handleXmlInvalidEntries(tmpValue)
                 : tmpValue
                 } `;
             });
-            tmp += `</${xkey}>`;
+            tmp += `</${getObjKey(xkey)}>`;
           }
         }
       } else if (xvalue.constructor.name === 'Object') {
@@ -376,16 +381,16 @@ class App extends React.Component<{}, AppState> {
           tmp += `</${xkey}>`;
         }
       } else if (xvalue.constructor.name === 'Date') {
-        tmp += `<${xkey}>`;
+        tmp += `<${getObjKey(xkey)}>`;
         tmp += xvalue.toISOString();
-        tmp += `</${xkey}>`;
+        tmp += `</${getObjKey(xkey)}>`;
       } else {
-        tmp += `<${xkey}>`;
+        tmp += `<${getObjKey(xkey)}>`;
         tmp +=
           typeof xvalue === 'string'
             ? this.handleXmlInvalidEntries(xvalue)
             : xvalue;
-        tmp += `</${xkey}>`;
+        tmp += `</${getObjKey(xkey)}>`;
       }
     }
     return tmp;
