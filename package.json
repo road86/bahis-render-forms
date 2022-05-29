@@ -15,7 +15,7 @@
     "axios": "^0.19.0",
     "jszip": "^3.2.2",
     "jszip-utils": "^0.1.0",
-    "odkformrenderer": "git+ssh://git@bitbucket.org:mpowersocial/odk-form-renderer-v2-lib.git#develop",
+    "odkformrenderer": "git+ssh://git@github.com:road86/odk-form-renderer-v2-lib.git#develop",
     "query-string": "^6.9.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
